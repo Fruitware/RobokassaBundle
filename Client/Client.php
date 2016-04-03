@@ -30,12 +30,12 @@ class Client
 
     private function getWebServerUrl()
     {
-        return $this->test ? 'http://test.robokassa.ru/Index.aspx' : 'https://auth.robokassa.ru/Merchant/Index.aspx';
+        return 'https://auth.robokassa.ru/Merchant/Index.aspx';
     }
 
     private function getXmlServerUrl()
     {
-        return $this->test ? 'http://test.robokassa.ru/Webservice/Service.asmx' : 'https://merchant.roboxchange.com/WebService/Service.asmx';
+        return 'https://merchant.roboxchange.com/WebService/Service.asmx';
     }
 
     public function getRedirectUrl(FinancialTransactionInterface $transaction)
@@ -46,19 +46,20 @@ class Client
         /** @var ExtendedDataInterface $data */
         $data = $transaction->getExtendedData();
         $data->set('inv_id', $inv_id);
-        
+
         $description = 'test desc';
         if($data->has('description')) {
             $description = $data->get('description');
         }
-        
+
         $parameters = [
             'MrchLogin' => $this->login,
             'OutSum' => $transaction->getRequestedAmount(),
             'InvId' => $inv_id,
             'Desc' => $description,
             'IncCurrLabel' => '',
-            'SignatureValue' => $this->auth->sign($this->login, $transaction->getRequestedAmount(), $inv_id)
+            'IsTest' => $this->test ? 1 : 0,
+            'Signature' => $this->auth->sign($this->login, $transaction->getRequestedAmount(), $inv_id),
         ];
 
         return $this->getWebServerUrl() .'?' . http_build_query($parameters);
@@ -67,7 +68,7 @@ class Client
     private function post($uri, array $parameters = [])
     {
         $guzzle  = new Guzzle();
-        return $guzzle->post($uri, [ 'body' => $parameters ]);
+        return $guzzle->post($uri, ['form_params' => $parameters]);
     }
 
     private function sendXMLRequest($url, $params = [])
