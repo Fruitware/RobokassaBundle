@@ -35,7 +35,7 @@ class Client
 
     private function getXmlServerUrl()
     {
-        return 'https://merchant.roboxchange.com/WebService/Service.asmx';
+        return 'https://auth.robokassa.ru/Merchant/WebService/Service.asmx';
     }
 
     public function getRedirectUrl(FinancialTransactionInterface $transaction)
@@ -78,7 +78,7 @@ class Client
         $xml = new \SimpleXMLElement($response->getBody());
         $result_code = (int) $xml->Result->Code;
         if ($result_code !== 0) {
-            throw new BlockedException("Awaiting extended data");
+            throw new BlockedException($xml->Result->Description);
         }
         return $xml;
     }
@@ -88,11 +88,12 @@ class Client
         $params = [
             'MerchantLogin' => $this->login,
             'InvoiceID' => $inv_id,
+            'IsTest' => $this->test ? 1 : 0,
             'Signature' => $this->auth->signXML($this->login, $inv_id),
         ];
-        if ($this->test) {
-            $params['StateCode'] = 100;
-        }
+//        if ($this->test) {
+//            $params['StateCode'] = 100;
+//        }
 
         $url = $this->getXmlServerUrl() . '/' . 'OpState';
         $result = $this->sendXMLRequest($url, $params);
