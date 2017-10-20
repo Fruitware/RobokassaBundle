@@ -2,61 +2,82 @@
 namespace Fruitware\RobokassaBundle\Controller;
 
 use JMS\Payment\CoreBundle\Model\FinancialTransactionInterface;
+use JMS\Payment\CoreBundle\Model\PaymentInstructionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class RobokassaController extends Controller
 {
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     */
     public function callbackAction(Request $request)
     {
-        $out_sum = $request->get('OutSum');
-        $inv_id = $request->get('InvId');
+        $outSum = $request->get('OutSum');
+        $invoiceId = $request->get('InvId');
         $sign = $request->get('SignatureValue');
-        if (!$this->get('fruitware.robokassa.client.auth')->validateResult($sign, $out_sum, $inv_id)) {
-            return new Response('FAIL', 500);
+        if (!$this->get('fruitware.robokassa.client.auth')->validateResult($sign, $outSum, $invoiceId)) {
+            return new Response('FAIL', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        $instruction = $this->getInstruction($inv_id);
+        $instruction = $this->getInstruction($invoiceId);
 
         /** @var FinancialTransactionInterface $transaction */
         if (null === $transaction = $instruction->getPendingTransaction()) {
-            return new Response('FAIL', 500);
+            return new Response('FAIL', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         try {
-            $this->get('payment.plugin_controller')->approveAndDeposit($transaction->getPayment()->getId(), $out_sum);
+            $this->get('payment.plugin_controller')->approveAndDeposit($transaction->getPayment()->getId(), $outSum);
         } catch (\Exception $e) {
-            return new Response('FAIL', 500);
+            return new Response('FAIL', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         $this->getDoctrine()->getManager()->flush();
 
-        return new Response('OK' . $inv_id);
+        return new Response('OK' . $invoiceId);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return Response|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function successAction(Request $request)
     {
-        $out_sum = $request->get('OutSum');
-        $inv_id = $request->get('InvId');
+        $outSum = $request->get('OutSum');
+        $invoiceId = $request->get('InvId');
         $sign = $request->get('SignatureValue');
-        if (!$this->get('fruitware.robokassa.client.auth')->validateSuccess($sign, $out_sum, $inv_id)) {
-            return new Response('FAIL', 500);
+        if (!$this->get('fruitware.robokassa.client.auth')->validateSuccess($sign, $outSum, $invoiceId)) {
+            return new Response('FAIL', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        $instruction = $this->getInstruction($inv_id);
+        $instruction = $this->getInstruction($invoiceId);
         $data = $instruction->getExtendedData();
         return $this->redirect($data->get('return_url'));
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function failAction(Request $request)
     {
-        $inv_id = $request->get('InvId');
-        $instruction = $this->getInstruction($inv_id);
+        $invoiceId = $request->get('InvId');
+        $instruction = $this->getInstruction($invoiceId);
         $data = $instruction->getExtendedData();
         return $this->redirect($data->get('cancel_url'));
     }
 
+    /**
+     * @param $id
+     *
+     * @return PaymentInstructionInterface
+     * @throws \Exception
+     */
     private function getInstruction($id)
     {
         $instruction = $this->getDoctrine()->getManager()->getRepository('JMSPaymentCoreBundle:PaymentInstruction')->find($id);

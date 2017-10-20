@@ -16,26 +16,26 @@ class Auth
         $this->password2 = $password2;
     }
 
-    public function sign($login, $out_sum, $inv_id)
+    public function sign($login, $outSum, $invoiceId)
     {
-        return md5($login . ':' . $out_sum . ':' . $inv_id . ':' . $this->password1);
+        return md5($login . ':' . $outSum . ':' . $invoiceId . ':' . $this->password1);
     }
 
-    public function signXML($login, $inv_id)
+    public function signXML($login, $invoiceId)
     {
-        return md5($login . ':' . $inv_id . ':' . $this->password2);
+        return md5($login . ':' . $invoiceId . ':' . $this->password2);
     }
 
 
-    public function validateResult($sign, $out_sum, $inv_id)
+    public function validateResult($sign, $outSum, $invoiceId)
     {
-        $crc = md5($out_sum . ':' . $inv_id . ':' . $this->password2);
+        $crc = md5($outSum . ':' . $invoiceId . ':' . $this->password2);
         return strtoupper($sign) === strtoupper($crc);
     }
 
-    public function validateSuccess($sign, $out_sum, $inv_id)
+    public function validateSuccess($sign, $outSum, $invoiceId)
     {
-        $crc = md5($out_sum . ':' . $inv_id . ':' . $this->password1);
+        $crc = md5($outSum . ':' . $invoiceId . ':' . $this->password1);
         return strtoupper($sign) === strtoupper($crc);
     }
 }

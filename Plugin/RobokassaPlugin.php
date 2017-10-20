@@ -1,13 +1,11 @@
 <?php
 namespace Fruitware\RobokassaBundle\Plugin;
 
-use JMS\Payment\CoreBundle\Model\ExtendedDataInterface;
 use JMS\Payment\CoreBundle\Model\FinancialTransactionInterface;
 use JMS\Payment\CoreBundle\Model\PaymentInstructionInterface;
 use JMS\Payment\CoreBundle\Plugin\AbstractPlugin;
 use JMS\Payment\CoreBundle\Plugin\Exception\Action\VisitUrl;
 use JMS\Payment\CoreBundle\Plugin\Exception\ActionRequiredException;
-use JMS\Payment\CoreBundle\Plugin\Exception\BlockedException;
 use JMS\Payment\CoreBundle\Plugin\Exception\FinancialException;
 use JMS\Payment\CoreBundle\Plugin\Exception\PaymentPendingException;
 use JMS\Payment\CoreBundle\Plugin\PluginInterface;
@@ -39,6 +37,8 @@ class RobokassaPlugin extends AbstractPlugin
 
     public function __construct(Client $client)
     {
+        parent::__construct(false);
+
         $this->client = $client;
     }
 
@@ -52,12 +52,14 @@ class RobokassaPlugin extends AbstractPlugin
         if ($transaction->getState() === FinancialTransactionInterface::STATE_NEW) {
             throw $this->createRedirectActionException($transaction);
         }
+
         /** @var PaymentInstructionInterface $instruction */
         $instruction = $transaction->getPayment()->getPaymentInstruction();
-        $state_code = $this->client->requestOpState($instruction->getId());
-        switch ($state_code) {
+        $stateCode = $this->client->requestOpState($instruction->getId());
+        switch ($stateCode) {
             case self::STATUS_COMPLETED:
                 break;
+
             case self::STATUS_PENDING:
                 throw new PaymentPendingException('Payment is still pending');
 
@@ -72,12 +74,11 @@ class RobokassaPlugin extends AbstractPlugin
             case self::STATUS_REFUND:
                 return $this->reverseDeposit($transaction, $retry);
 
-
             default:
-                $ex = new FinancialException('Payment status unknow: ' . $state_code);
+                $ex = new FinancialException('Payment status unknow: ' . $stateCode);
                 $ex->setFinancialTransaction($transaction);
                 $transaction->setResponseCode('Failed');
-                $transaction->setReasonCode($state_code);
+                $transaction->setReasonCode($stateCode);
                 throw $ex;
         }
 

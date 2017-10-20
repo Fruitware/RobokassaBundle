@@ -5,21 +5,21 @@ parameters:
     fruitware.robokassa.client.auth.class: Fruitware\RobokassaBundle\Client\Auth
 services:
     fruitware.form.type.robokassa:
-        class: %fruitware.form.type.robokassa.class%
+        class: '%fruitware.form.type.robokassa.class%'
         tags:
-            - { name: "payment.method_form_type" }
-            - { name: "form.type", alias: "robokassa" }
+            - { name: 'payment.method_form_type' }
+            - { name: 'form.type', alias: 'robokassa' }
 
     fruitware.plugin.robokassa:
-        class: %fruitware.plugin.robokassa.class%
-        arguments: [ "@fruitware.robokassa.client" ]
+        class: '%fruitware.plugin.robokassa.class%'
+        arguments: [ '@fruitware.robokassa.client' ]
         tags:
-            - { name: "payment.plugin" }
+            - { name: 'payment.plugin' }
 
     fruitware.robokassa.client:
-        class: %fruitware.robokassa.client.class%
-        arguments: [ "@fruitware.robokassa.client.auth", %fruitware_robokassa.login%, %fruitware_robokassa.test% ]
+        class: '%fruitware.robokassa.client.class%'
+        arguments: [ '@fruitware.robokassa.client.auth', '%fruitware_robokassa.login%', '%fruitware_robokassa.test%' ]
 
     fruitware.robokassa.client.auth:
-        class: %fruitware.robokassa.client.auth.class%
-        arguments: [ %fruitware_robokassa.password1%, %fruitware_robokassa.password2% ]
+        class: '%fruitware.robokassa.client.auth.class%'
+        arguments: [ '%fruitware_robokassa.password1%', '%fruitware_robokassa.password2%' ]

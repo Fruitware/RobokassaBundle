@@ -1,26 +1,37 @@
 <?php
+
 namespace Fruitware\RobokassaBundle\Client;
 
 use GuzzleHttp\Client as Guzzle;
 
 use JMS\Payment\CoreBundle\Model\ExtendedDataInterface;
 use JMS\Payment\CoreBundle\Model\FinancialTransactionInterface;
-use JMS\Payment\CoreBundle\Model\PaymentInstructionInterface;
 use JMS\Payment\CoreBundle\Plugin\Exception\BlockedException;
 
 class Client
 {
-
-    /** @var  Auth */
+    /**
+     * @var Auth
+     */
     private $auth;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $login;
 
-    /** @var  bool */
+    /**
+     * @var bool
+     */
     private $test;
 
-
+    /**
+     * Client constructor.
+     *
+     * @param Auth $auth
+     * @param string $login
+     * @param string $test
+     */
     public function __construct(Auth $auth, $login, $test)
     {
         $this->auth = $auth;
@@ -28,24 +39,33 @@ class Client
         $this->test = $test;
     }
 
+    /**
+     * @return string
+     */
     private function getWebServerUrl()
     {
         return 'https://auth.robokassa.ru/Merchant/Index.aspx';
     }
 
+    /**
+     * @return string
+     */
     private function getXmlServerUrl()
     {
         return 'https://auth.robokassa.ru/Merchant/WebService/Service.asmx';
     }
 
+    /**
+     * @param FinancialTransactionInterface $transaction
+     *
+     * @return string
+     */
     public function getRedirectUrl(FinancialTransactionInterface $transaction)
     {
-        /** @var PaymentInstructionInterface $instruction */
-        $instruction = $transaction->getPayment()->getPaymentInstruction();
-        $inv_id = $instruction->getId();
+        $invoiceId = $transaction->getPayment()->getPaymentInstruction()->getId();
         /** @var ExtendedDataInterface $data */
         $data = $transaction->getExtendedData();
-        $data->set('inv_id', $inv_id);
+        $data->set('invoiceId', $invoiceId);
 
         $description = 'test desc';
         if($data->has('description')) {
@@ -55,41 +75,59 @@ class Client
         $parameters = [
             'MrchLogin' => $this->login,
             'OutSum' => $transaction->getRequestedAmount(),
-            'InvId' => $inv_id,
+            'InvId' => $invoiceId,
             'Desc' => $description,
             'IncCurrLabel' => '',
             'IsTest' => $this->test ? 1 : 0,
-            'Signature' => $this->auth->sign($this->login, $transaction->getRequestedAmount(), $inv_id),
+            'Signature' => $this->auth->sign($this->login, $transaction->getRequestedAmount(), $invoiceId),
         ];
 
         return $this->getWebServerUrl() .'?' . http_build_query($parameters);
     }
 
+    /**
+     * @param string $uri
+     * @param array $parameters
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
     private function post($uri, array $parameters = [])
     {
         $guzzle  = new Guzzle();
         return $guzzle->post($uri, ['form_params' => $parameters]);
     }
 
-    private function sendXMLRequest($url, $params = [])
+    /**
+     * @param string $url
+     * @param array $params
+     *
+     * @return \SimpleXMLElement
+     * @throws BlockedException
+     */
+    private function sendXMLRequest($url, array $params = [])
     {
         $url = sprintf('%s?%s', $url, http_build_query($params));
         $response = $this->post($url, $params);
-        $xml = new \SimpleXMLElement($response->getBody());
-        $result_code = (int) $xml->Result->Code;
+        $xml = new \SimpleXMLElement($response->getBody()->getContents());
+        $result_code = (int)$xml->Result->Code;
         if ($result_code !== 0) {
             throw new BlockedException($xml->Result->Description);
         }
         return $xml;
     }
 
-    public function requestOpState($inv_id)
+    /**
+     * @param int $invoiceId
+     *
+     * @return int
+     */
+    public function requestOpState($invoiceId)
     {
         $params = [
             'MerchantLogin' => $this->login,
-            'InvoiceID' => $inv_id,
+            'InvoiceID' => $invoiceId,
             'IsTest' => $this->test ? 1 : 0,
-            'Signature' => $this->auth->signXML($this->login, $inv_id),
+            'Signature' => $this->auth->signXML($this->login, $invoiceId),
         ];
 //        if ($this->test) {
 //            $params['StateCode'] = 100;
