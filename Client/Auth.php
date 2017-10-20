@@ -1,5 +1,5 @@
 <?php
-namespace Karser\RobokassaBundle\Client;
+namespace Fruitware\RobokassaBundle\Client;
 
 class Auth
 {

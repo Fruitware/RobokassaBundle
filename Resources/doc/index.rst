@@ -4,7 +4,7 @@ Installation
 1. Using Composer (recommended)
 -------------------------------
 
-To install KarserRobokassaBundle with Composer just add the following to your
+To install FruitwareRobokassaBundle with Composer just add the following to your
 `composer.json` file:
 
 .. code-block :: js
@@ -12,10 +12,10 @@ To install KarserRobokassaBundle with Composer just add the following to your
     // composer.json
     {
         require: {
-            "karser/robokassa-bundle": "dev-master"
+            "fruitware/robokassa-bundle": "dev-master"
         }
     }
-    
+
 
 Then, you can install the new dependencies by running Composer's ``update``
 command from the directory where your ``composer.json`` file is located:
@@ -23,7 +23,7 @@ command from the directory where your ``composer.json`` file is located:
 .. code-block :: bash
 
     $ php composer.phar update
-    
+
 Now, Composer will automatically download all required files, and install them
 for you. All that is left to do is to update your ``AppKernel.php`` file, and
 register the new bundle:
@@ -35,7 +35,7 @@ register the new bundle:
     // in AppKernel::registerBundles()
     $bundles = array(
         // ...
-        new Karser\RobokassaBundle\KarserRobokassaBundle(),
+        new Fruitware\RobokassaBundle\FruitwareRobokassaBundle(),
         // ...
     );
 
@@ -62,7 +62,7 @@ Configuration
 .. code-block :: yml
 
     // config.yml
-    karser_robokassa:
+    fruitware_robokassa:
         login: username
         password1: pass1
         password2: pass2
@@ -72,8 +72,8 @@ Configuration
 .. code-block :: yml
 
     // routing.yml
-    karser_robokassa:
-        resource: "@KarserRobokassaBundle/Resources/config/routing.yml"
+    fruitware_robokassa:
+        resource: "@FruitwareRobokassaBundle/Resources/config/routing.yml"
         prefix:   /
 
 =====

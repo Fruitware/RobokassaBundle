@@ -1,5 +1,5 @@
 <?php
-namespace Karser\RobokassaBundle\Client;
+namespace Fruitware\RobokassaBundle\Client;
 
 use GuzzleHttp\Client as Guzzle;
 

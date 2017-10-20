@@ -1,11 +1,11 @@
-karser_robokassa_callback:
+fruitware_robokassa_callback:
     path:  /robokassa/callback
-    defaults: { _controller: KarserRobokassaBundle:Robokassa:callback }
+    defaults: { _controller: FruitwareRobokassaBundle:Robokassa:callback }
 
-karser_robokassa_success:
+fruitware_robokassa_success:
     path:  /robokassa/success
-    defaults: { _controller: KarserRobokassaBundle:Robokassa:success }
+    defaults: { _controller: FruitwareRobokassaBundle:Robokassa:success }
 
-karser_robokassa_fail:
+fruitware_robokassa_fail:
     path:  /robokassa/fail
-    defaults: { _controller: KarserRobokassaBundle:Robokassa:fail }
+    defaults: { _controller: FruitwareRobokassaBundle:Robokassa:fail }

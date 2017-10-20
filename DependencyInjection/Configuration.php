@@ -1,6 +1,6 @@
 <?php
 
-namespace Karser\RobokassaBundle\DependencyInjection;
+namespace Fruitware\RobokassaBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('karser_robokassa');
+        $rootNode = $treeBuilder->root('fruitware_robokassa');
 
         $rootNode->children()
             ->scalarNode('login')->isRequired()->end()

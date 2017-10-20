@@ -1,5 +1,5 @@
 <?php
-namespace Karser\RobokassaBundle\Plugin;
+namespace Fruitware\RobokassaBundle\Plugin;
 
 use JMS\Payment\CoreBundle\Model\ExtendedDataInterface;
 use JMS\Payment\CoreBundle\Model\FinancialTransactionInterface;
@@ -11,7 +11,7 @@ use JMS\Payment\CoreBundle\Plugin\Exception\BlockedException;
 use JMS\Payment\CoreBundle\Plugin\Exception\FinancialException;
 use JMS\Payment\CoreBundle\Plugin\Exception\PaymentPendingException;
 use JMS\Payment\CoreBundle\Plugin\PluginInterface;
-use Karser\RobokassaBundle\Client\Client;
+use Fruitware\RobokassaBundle\Client\Client;
 
 class RobokassaPlugin extends AbstractPlugin
 {

@@ -1,5 +1,5 @@
 <?php
-namespace Karser\RobokassaBundle\Controller;
+namespace Fruitware\RobokassaBundle\Controller;
 
 use JMS\Payment\CoreBundle\Model\FinancialTransactionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -14,7 +14,7 @@ class RobokassaController extends Controller
         $out_sum = $request->get('OutSum');
         $inv_id = $request->get('InvId');
         $sign = $request->get('SignatureValue');
-        if (!$this->get('karser.robokassa.client.auth')->validateResult($sign, $out_sum, $inv_id)) {
+        if (!$this->get('fruitware.robokassa.client.auth')->validateResult($sign, $out_sum, $inv_id)) {
             return new Response('FAIL', 500);
         }
 
@@ -40,7 +40,7 @@ class RobokassaController extends Controller
         $out_sum = $request->get('OutSum');
         $inv_id = $request->get('InvId');
         $sign = $request->get('SignatureValue');
-        if (!$this->get('karser.robokassa.client.auth')->validateSuccess($sign, $out_sum, $inv_id)) {
+        if (!$this->get('fruitware.robokassa.client.auth')->validateSuccess($sign, $out_sum, $inv_id)) {
             return new Response('FAIL', 500);
         }
 

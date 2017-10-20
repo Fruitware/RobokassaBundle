@@ -1,5 +1,5 @@
 {
-    "name": "karser/robokassa-bundle",
+    "name": "fruitware/robokassa-bundle",
     "type": "symfony-bundle",
     "description": "Bundle allows you to accept Robokassa payments",
     "keywords": ["payment", "robokassa"],
@@ -11,13 +11,13 @@
         "guzzlehttp/guzzle": "~6.0"
     },
     "autoload": {
-        "psr-0": { "Karser\\RobokassaBundle": "" }
+        "psr-0": { "Fruitware\\RobokassaBundle": "" }
     },
-    "target-dir": "Karser/RobokassaBundle",
+    "target-dir": "Fruitware/RobokassaBundle",
     "authors": [
         {
-            "name": "Dmitry Poddubny",
-            "email": "dpoddubny@gmail.com"
+            "name": "Coroliov Oleg",
+            "email": "ruscon@gmail.com"
         }
     ]
 }
